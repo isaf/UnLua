@@ -19,6 +19,7 @@
 #include "GenericPlatform/GenericApplication.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "UnLuaBase.h"
+#include "UnLuaManager.h"
 
 class FLuaContext : public FUObjectArray::FUObjectCreateListener, public FUObjectArray::FUObjectDeleteListener
 {
@@ -44,6 +45,8 @@ public:
 
     void AddLibraryName(const TCHAR *LibraryName) { LibraryNames.Add(LibraryName); }
     void AddModuleName(const TCHAR *ModuleName) { ModuleNames.AddUnique(ModuleName); }
+
+    UUnLuaManager* GetUnLuaManager() { return Manager; }
 
 #if ENGINE_MINOR_VERSION > 23
     void OnWorldTickStart(UWorld *World, ELevelTick TickType, float DeltaTime);

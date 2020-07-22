@@ -14,10 +14,11 @@
 
 #include "Modules/ModuleManager.h"
 #include "LuaContext.h"
+#include "UnLua.h"
 
 #define LOCTEXT_NAMESPACE "FUnLuaModule"
 
-class FUnLuaModule : public IModuleInterface
+class FUnLuaModule : public IModuleInterface, private FSelfRegisteringExec
 {
 public:
     virtual void StartupModule() override
@@ -28,6 +29,14 @@ public:
 
     virtual void ShutdownModule() override
     {
+    }
+
+    // FExec
+    virtual bool Exec(class UWorld* InWorld, const TCHAR* Cmd, FOutputDevice& Ar) override
+    {
+        int nResult = 0;
+        UnLua::FLuaRetValues Ret = UnLua::CallTableFunc(UnLua::GetState(), "SystemCallback", "OnGmCmd", (ANSICHAR*)StringCast<ANSICHAR>(static_cast<const TCHAR*>(Cmd)).Get());
+        return Ret.IsValid() && Ret.Num() >= 1 && Ret[0].Value<bool>();
     }
 };
 

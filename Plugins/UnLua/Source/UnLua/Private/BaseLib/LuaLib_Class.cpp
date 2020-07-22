@@ -15,6 +15,8 @@
 #include "UnLuaEx.h"
 #include "LuaCore.h"
 #include "ReflectionUtils/ClassDesc.h"
+#include "UnLuaManager.h"
+#include "LuaContext.h"
 
 /**
  * Load a class. for example: UClass.Load("/Game/Core/Blueprints/AICharacter.AICharacter_C")
@@ -102,10 +104,42 @@ static int32 UClass_IsChildOf(lua_State *L)
     return 1;
 }
 
+static int32 UClass_AddFunction(lua_State* L)
+{
+    int32 NumParams = lua_gettop(L);
+    if (NumParams != 2)
+    {
+        UE_LOG(LogUnLua, Log, TEXT("%s: Invalid parameters!"), ANSI_TO_TCHAR(__FUNCTION__));
+        return 0;
+    }
+    UClass* SrcClass = Cast<UClass>(UnLua::GetUObject(L, 1));
+    if (!SrcClass)
+    {
+        UE_LOG(LogUnLua, Log, TEXT("%s: Invalid source class!"), ANSI_TO_TCHAR(__FUNCTION__));
+        return 0;
+    }
+
+    FName FuncName(lua_tostring(L, 2));
+    UBlueprintGeneratedClass* Ret = Cast<UBlueprintGeneratedClass>(SrcClass);
+    if (Ret)
+    {
+        UFunction* NewFunction = NewObject<UFunction>(Ret, FuncName, RF_Public | RF_Transient);
+        NewFunction->FunctionFlags |= FUNC_BlueprintEvent;
+        SrcClass->AddFunctionToFunctionMap(NewFunction, FuncName);
+
+        UUnLuaManager* Manager = GLuaCxt->GetUnLuaManager();
+        Manager->OverrideFunction(NewFunction, SrcClass, FuncName);
+        lua_pushboolean(L, 1);
+        return 1;
+    }
+    return 0;
+}
+
 static const luaL_Reg UClassLib[] =
 {
     { "Load", UClass_Load },
     { "IsChildOf", UClass_IsChildOf },
+    { "AddFunction", UClass_AddFunction },
     { nullptr, nullptr }
 };
 

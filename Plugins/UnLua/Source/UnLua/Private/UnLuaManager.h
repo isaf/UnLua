@@ -50,6 +50,8 @@ public:
 
     void OnActorSpawned(class AActor *Actor);
 
+    void OverrideFunction(UFunction* TemplateFunction, UClass* OuterClass, FName NewFuncName);
+
     UFUNCTION()
     void OnActorDestroyed(class AActor *Actor);
 
@@ -84,7 +86,6 @@ private:
     bool ConditionalUpdateClass(UClass *Class, const TSet<FName> &LuaFunctions, TMap<FName, UFunction*> &UEFunctions);
 
     void OverrideFunctions(const TSet<FName> &LuaFunctions, TMap<FName, UFunction*> &UEFunctions, UClass *OuterClass, bool bCheckFuncNetMode = false);
-    void OverrideFunction(UFunction *TemplateFunction, UClass *OuterClass, FName NewFuncName);
     void AddFunction(UFunction *TemplateFunction, UClass *OuterClass, FName NewFuncName);
     void ReplaceFunction(UFunction *TemplateFunction, UClass *OuterClass);
 

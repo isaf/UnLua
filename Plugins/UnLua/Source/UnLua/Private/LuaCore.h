@@ -161,8 +161,10 @@ int32 Global_SetUProperty(lua_State *L);
 int32 Global_LoadObject(lua_State *L);
 int32 Global_LoadClass(lua_State *L);
 int32 Global_NewObject(lua_State *L);
+int32 Global_AddActorComponent(lua_State* L);
 UNLUA_API int32 Global_Print(lua_State *L);
 UNLUA_API int32 Global_Require(lua_State *L);
+UNLUA_API int32 Global_Log(lua_State* L);
 
 /**
  * Functions to handle UEnum

@@ -12,6 +12,17 @@ local RegisterClass = RegisterClass
 local RegisterEnum = RegisterEnum
 local print = UEPrint
 
+__tostring = tostring
+tostring = function(s)
+	if type(s) == 'table' then
+		return string.format('[tb]%s', __tostring(s))
+	elseif type(s) == 'userdata' then
+		return string.format('[ud]%s', __tostring(s))
+	else
+		return __tostring(s)
+	end;
+end;
+
 _NotExist = _NotExist or {}
 local NotExist = _NotExist
 
@@ -91,7 +102,35 @@ else
 	print("WITH_UE4_NAMESPACE==false");
 end
 
+
+_G.logerror = function(...)
+	local n = select('#', ...)
+	local arg = {...}
+	for i=1,n do
+		arg[i] = tostring(arg[i])
+	end;
+	local strLog = table.concat(arg, '\t')
+	UELog(strLog, 3)
+end;
+perror = logerror
 _G.print = print
 _G.Index = Index
 _G.NewIndex = NewIndex
 _G.Class = Class
+
+SystemCallback =
+{
+	OnGmCmd = function(strCmd)
+		strCmd = strCmd:match('?gm (.+)');
+		if strCmd then
+			local func, strError = load(strCmd, 'OnDoConsoleCmd');
+			if not func then
+				perror(strError);
+			else
+				func()
+			end;
+			return true;
+		end;
+		return false;
+	end,
+}

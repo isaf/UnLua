@@ -1814,6 +1814,23 @@ int32 Global_LoadClass(lua_State *L)
     return UClass_Load(L);
 }
 
+int32 Global_AddActorComponent(lua_State* L)
+{
+    AActor* Actor = Cast<AActor>(UnLua::GetUObject(L, 1));
+    if (Actor)
+    {
+        UClass* Class = Cast<UClass>(UnLua::GetUObject(L, 2));
+        if (Class)
+        {
+            UActorComponent* Component = NewObject<UActorComponent>(Actor, Class);
+            //Actor->AddInstanceComponent(Component);
+            Actor->AddOwnedComponent(Component);
+            Component->RegisterComponent();
+        }
+    }
+    return 0;
+}
+
 /**
  * Global glue function to create a UObject
  */
@@ -1865,6 +1882,34 @@ int32 Global_NewObject(lua_State *L)
     }
 
     return 1;
+}
+
+int32 Global_Log(lua_State* L)
+{
+    const char* szLog = lua_tostring(L, 1);
+    FString StrLog = UTF8_TO_TCHAR(szLog);
+    int type = luaL_optinteger(L, 2, 1);
+    switch (type)
+    {
+    case 1:
+    {
+        UE_LOG(LogUnLua, Log, TEXT("== UNLUA_LOG : %s"), *StrLog);
+        break;
+    }
+    case 2:
+    {
+        UE_LOG(LogUnLua, Warning, TEXT("== UNLUA_LOG : %s"), *StrLog);
+        break;
+    }
+    case 3:
+    {
+        UE_LOG(LogUnLua, Error, TEXT("== UNLUA_LOG : %s"), *StrLog);
+        break;
+    }
+    default:
+        break;
+    }
+    return 0;
 }
 
 int32 Global_Print(lua_State *L)

@@ -58,7 +58,6 @@ FFunctionDesc::FFunctionDesc(UFunction *InFunction, FParameterCollection *InDefa
     FOutParmRec *CurrentOutParmRec = nullptr;
 #endif
 
-    static const FName NAME_LatentInfo = TEXT("LatentInfo");
     Properties.Reserve(InFunction->NumParms);
     for (TFieldIterator<FProperty> It(InFunction); It && (It->PropertyFlags & CPF_Parm); ++It)
     {
@@ -68,7 +67,7 @@ FFunctionDesc::FFunctionDesc(UFunction *InFunction, FParameterCollection *InDefa
         {
             ReturnPropertyIndex = Index;                                // return property
         }
-        else if (LatentPropertyIndex == INDEX_NONE && Property->GetFName() == NAME_LatentInfo)
+        else if (LatentPropertyIndex == INDEX_NONE && IsLatentInfoParam(Property))
         {
             LatentPropertyIndex = Index;                                // 'LatentInfo' property for latent function
         }
@@ -154,6 +153,13 @@ FFunctionDesc::~FFunctionDesc()
     {
         luaL_unref(*GLuaCxt, LUA_REGISTRYINDEX, FunctionRef);
     }
+}
+
+bool FFunctionDesc::IsLatentInfoParam(FProperty* Property)
+{
+    static const FName NAME_LatentInfo = TEXT("LatentActionInfo");
+    FStructProperty* Struct = CastField<FStructProperty>(Property);
+    return Struct && Struct->Struct->GetFName() == NAME_LatentInfo;
 }
 
 /**

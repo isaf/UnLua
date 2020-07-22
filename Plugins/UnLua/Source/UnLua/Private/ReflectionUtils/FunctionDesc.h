@@ -90,6 +90,13 @@ public:
     FORCEINLINE UFunction* GetFunction() const { return Function; }
 
     /**
+     * Check whether the property's type is LatentActionInfo
+     *
+     * @return - true if the property's type is LatentActionInfo
+     */
+    bool IsLatentInfoParam(FProperty* Property);
+
+    /**
      * Call Lua function that overrides this UFunction
      *
      * @param Stack - script execution stack

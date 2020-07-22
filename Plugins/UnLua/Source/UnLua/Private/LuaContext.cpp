@@ -193,8 +193,10 @@ void FLuaContext::CreateState()
         lua_register(L, "LoadObject", Global_LoadObject);
         lua_register(L, "LoadClass", Global_LoadClass);
         lua_register(L, "NewObject", Global_NewObject);
+        lua_register(L, "AddActorComponent", Global_AddActorComponent);
 
         lua_register(L, "UEPrint", Global_Print);
+        lua_register(L, "UELog", Global_Log);
         if (FPlatformProperties::RequiresCookedData())
         {
             lua_register(L, "require", Global_Require);             // override 'require' when running with cooked data
